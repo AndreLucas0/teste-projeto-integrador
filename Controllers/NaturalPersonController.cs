@@ -7,6 +7,8 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using api.Data;
 using api.Models;
+using api.Interfaces.Services;
+using api.DTOs.NaturalPerson;
 
 namespace api.Controllers
 {
@@ -14,95 +16,66 @@ namespace api.Controllers
     [ApiController]
     public class NaturalPersonController : ControllerBase
     {
-        private readonly BackEndAPIContext _context;
+        private readonly INaturalPersonService _service;
 
-        public NaturalPersonController(BackEndAPIContext context)
+        public NaturalPersonController(INaturalPersonService service)
         {
-            _context = context;
+            _service = service;
         }
 
-        // GET: api/NaturalPerson
         [HttpGet]
-        public async Task<ActionResult<IEnumerable<NaturalPerson>>> GetNaturalPerson()
+        public async Task<ActionResult<IEnumerable<NaturalPerson>>> GetAll()
         {
-            return await _context.NaturalPerson.ToListAsync();
+            return Ok(await _service.GetAll());
         }
     
-        // GET: api/NaturalPerson/5
         [HttpGet("{id}")]
-        public async Task<ActionResult<NaturalPerson>> GetNaturalPerson(long id)
+        public async Task<ActionResult<NaturalPerson>> GetById(long id)
         {
-            var naturalPerson = await _context.NaturalPerson.FindAsync(id);
-
+            var naturalPerson = await _service.GetById(id);
             if (naturalPerson == null)
             {
-                return NotFound();
+                return NotFound("Natural person not found");
             }
 
-            return naturalPerson;
+            return Ok(naturalPerson);
         }
 
-        // PUT: api/NaturalPerson/5
-        // To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754
         [HttpPut("{id}")]
-        public async Task<IActionResult> PutNaturalPerson(long id, NaturalPerson naturalPerson)
+        public async Task<IActionResult> Update(long id, UpdateNaturalPersonDTO dto)
         {
-            if (id != naturalPerson.Id)
+            var naturalPerson = await _service.Update(id, dto);
+            if (naturalPerson == null)
             {
-                return BadRequest();
+                return NotFound("Natural person not found");
             }
 
-            _context.Entry(naturalPerson).State = EntityState.Modified;
-
-            try
-            {
-                await _context.SaveChangesAsync();
-            }
-            catch (DbUpdateConcurrencyException)
-            {
-                if (!NaturalPersonExists(id))
-                {
-                    return NotFound();
-                }
-                else
-                {
-                    throw;
-                }
-            }
-
-            return NoContent();
+            return Ok(naturalPerson);
         }
 
-        // POST: api/NaturalPerson
-        // To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754
         [HttpPost]
-        public async Task<ActionResult<NaturalPerson>> PostNaturalPerson(NaturalPerson naturalPerson)
+        public async Task<ActionResult<NaturalPerson>> Create(CreateNaturalPersonDTO dto)
         {
-            _context.NaturalPerson.Add(naturalPerson);
-            await _context.SaveChangesAsync();
-
-            return CreatedAtAction("GetNaturalPerson", new { id = naturalPerson.Id }, naturalPerson);
+            var naturalPerson = await _service.Create(dto);
+            
+            return CreatedAtAction(
+                nameof(GetById),
+                new { id = naturalPerson.Id },
+                naturalPerson
+            );
         }
 
         // DELETE: api/NaturalPerson/5
         [HttpDelete("{id}")]
         public async Task<IActionResult> DeleteNaturalPerson(long id)
         {
-            var naturalPerson = await _context.NaturalPerson.FindAsync(id);
-            if (naturalPerson == null)
+            var naturalPerson = await _service.Delete(id);
+            if (!naturalPerson)
             {
-                return NotFound();
+                return NotFound("Natural person not found");
             }
 
-            _context.NaturalPerson.Remove(naturalPerson);
-            await _context.SaveChangesAsync();
-
             return NoContent();
-        }
-
-        private bool NaturalPersonExists(long id)
-        {
-            return _context.NaturalPerson.Any(e => e.Id == id);
         }
     }
 }

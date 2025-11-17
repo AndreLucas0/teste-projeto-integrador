@@ -7,6 +7,8 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using api.Data;
 using api.Models;
+using api.Interfaces.Services;
+using api.DTOs.LegalEntity;
 
 namespace api.Controllers
 {
@@ -14,95 +16,65 @@ namespace api.Controllers
     [ApiController]
     public class LegalEntityController : ControllerBase
     {
-        private readonly BackEndAPIContext _context;
+        private readonly ILegalEntityService _service;
 
-        public LegalEntityController(BackEndAPIContext context)
+        public LegalEntityController(ILegalEntityService service)
         {
-            _context = context;
+            _service = service;
         }
 
-        // GET: api/LegalEntity
         [HttpGet]
-        public async Task<ActionResult<IEnumerable<LegalEntity>>> GetLegalEntity()
+        public async Task<ActionResult<IEnumerable<LegalEntity>>> GetAll()
         {
-            return await _context.LegalEntity.ToListAsync();
+            return Ok(await _service.GetAll());
         }
 
-        // GET: api/LegalEntity/5
         [HttpGet("{id}")]
-        public async Task<ActionResult<LegalEntity>> GetLegalEntity(long id)
+        public async Task<ActionResult<LegalEntity?>> GetById(long id)
         {
-            var legalEntity = await _context.LegalEntity.FindAsync(id);
-
+            var legalEntity = await _service.GetById(id);
             if (legalEntity == null)
             {
-                return NotFound();
+                return NotFound("Legal entity not found");
             }
 
-            return legalEntity;
+            return Ok(legalEntity);
         }
 
-        // PUT: api/LegalEntity/5
-        // To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754
         [HttpPut("{id}")]
-        public async Task<IActionResult> PutLegalEntity(long id, LegalEntity legalEntity)
+        public async Task<IActionResult> Update(long id, UpdateLegalEntityDTO dto)
         {
-            if (id != legalEntity.Id)
-            {
-                return BadRequest();
-            }
-
-            _context.Entry(legalEntity).State = EntityState.Modified;
-
-            try
-            {
-                await _context.SaveChangesAsync();
-            }
-            catch (DbUpdateConcurrencyException)
-            {
-                if (!LegalEntityExists(id))
-                {
-                    return NotFound();
-                }
-                else
-                {
-                    throw;
-                }
-            }
-
-            return NoContent();
-        }
-
-        // POST: api/LegalEntity
-        // To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754
-        [HttpPost]
-        public async Task<ActionResult<LegalEntity>> PostLegalEntity(LegalEntity legalEntity)
-        {
-            _context.LegalEntity.Add(legalEntity);
-            await _context.SaveChangesAsync();
-
-            return CreatedAtAction("GetLegalEntity", new { id = legalEntity.Id }, legalEntity);
-        }
-
-        // DELETE: api/LegalEntity/5
-        [HttpDelete("{id}")]
-        public async Task<IActionResult> DeleteLegalEntity(long id)
-        {
-            var legalEntity = await _context.LegalEntity.FindAsync(id);
+            var legalEntity = await _service.Update(id, dto);
             if (legalEntity == null)
             {
-                return NotFound();
+                return NotFound("Legal entity not found");   
             }
 
-            _context.LegalEntity.Remove(legalEntity);
-            await _context.SaveChangesAsync();
+            return Ok(legalEntity);
+        }
+
+        [HttpPost]
+        public async Task<ActionResult<LegalEntity>> Create(CreateLegalEntityDTO dto)
+        {
+            var legalEntity = await _service.Create(dto);
+            return CreatedAtAction(
+                nameof(GetById),
+                new { id = legalEntity.Id },
+                legalEntity
+            );
+        }
+
+        [HttpDelete("{id}")]
+        public async Task<IActionResult> Delete(long id)
+        {
+            var legalEntity = await _service.Delete(id);
+            if (!legalEntity)
+            {
+                return NotFound("Legal entity not found");
+            }
 
             return NoContent();
         }
 
-        private bool LegalEntityExists(long id)
-        {
-            return _context.LegalEntity.Any(e => e.Id == id);
-        }
     }
 }
