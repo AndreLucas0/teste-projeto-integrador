@@ -1,3 +1,4 @@
+using System.Threading.Tasks;
 using api.Data;
 using api.Interfaces.Repositories;
 using api.Models;
@@ -37,17 +38,31 @@ public class LegalEntityRepository : ILegalEntityRepository
 
     public async Task<List<LegalEntity>> GetAll()
     {
-        return await _context.LegalEntity.ToListAsync();
+        return await _context.LegalEntity
+                             .Include(c => c.Phones)
+                             .Include(c => c.Emails)
+                             .Include(c => c.Addresses)
+                             .ToListAsync();
     }
 
     public async Task<LegalEntity?> GetById(long id)
     {
-        return await _context.LegalEntity.FindAsync(id);
+        return await _context.LegalEntity
+                             .Include(c => c.Phones)
+                             .Include(c => c.Emails)
+                             .Include(c => c.Addresses)
+                             .FirstOrDefaultAsync(c => c.Id == id);
     }
 
     public async Task<LegalEntity> Update(LegalEntity legalEntity)
     {
         _context.LegalEntity.Update(legalEntity);
+        await _context.SaveChangesAsync();
+        return legalEntity;
+    }
+
+    public async Task<LegalEntity> Save(LegalEntity legalEntity)
+    {
         await _context.SaveChangesAsync();
         return legalEntity;
     }

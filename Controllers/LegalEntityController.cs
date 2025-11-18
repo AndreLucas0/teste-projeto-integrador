@@ -9,6 +9,7 @@ using api.Data;
 using api.Models;
 using api.Interfaces.Services;
 using api.DTOs.LegalEntity;
+using api.DTOs.Client;
 
 namespace api.Controllers
 {
@@ -74,6 +75,13 @@ namespace api.Controllers
             }
 
             return NoContent();
+        }
+
+        [HttpPost("{id}/phones")]
+        public async Task<IActionResult> CreatePhone(long id, CreatePhoneDTO dto)
+        {
+            var legalEntity = await _service.AddPhone(id, dto);
+            return Ok();
         }
 
     }

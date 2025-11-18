@@ -15,7 +15,7 @@ builder.Services.AddControllers();
 builder.Services.AddScoped<ILegalEntityRepository, LegalEntityRepository>();
 builder.Services.AddScoped<ILegalEntityService, LegalEntityService>();
 builder.Services.AddScoped<INaturalPersonRepository, NaturalPersonRepository>();
-builder.Services.AddScoped<INaturalPersonService, NaturalPersonService>();
+// builder.Services.AddScoped<INaturalPersonService, NaturalPersonService>();
 // Learn more about configuring OpenAPI at https://aka.ms/aspnet/openapi
 builder.Services.AddOpenApi();
 builder.Services.AddSwaggerGen();
