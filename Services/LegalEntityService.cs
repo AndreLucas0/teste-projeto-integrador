@@ -40,16 +40,7 @@ public class LegalEntityService : ILegalEntityService
 
     public async Task<List<LegalEntity>> GetAll()
     {
-        var legalEntities = await _repository.GetAll();
-        List<ResponseLegalEntityDTO> legalEntitiesDTO = [];
-        foreach (var e in legalEntities)
-        {
-            new ResponseLegalEntityDTO
-            {
-                Id = e.Id
-            };
-        }
-        
+        return await _repository.GetAll();
     }
 
     public async Task<LegalEntity?> GetById(long id)
