@@ -51,4 +51,10 @@ public class NaturalPersonRepository : INaturalPersonRepository
         await _context.SaveChangesAsync();
         return naturalPerson;
     }
+
+    public async Task<NaturalPerson> Save(NaturalPerson naturalPerson)
+    {
+        await _context.SaveChangesAsync();
+        return naturalPerson;
+    }
 }

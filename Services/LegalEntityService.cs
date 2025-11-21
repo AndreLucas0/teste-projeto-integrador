@@ -85,15 +85,42 @@ public class LegalEntityService : ILegalEntityService
         return await _repository.Save(legalEntity);
     }
 
-    public async Task<LegalEntity?> RemovePhone(long id, long phoneId)
+    public async Task<List<Phone>> GetAllPhones(long id)
+    {
+        var legalEntity = await GetById(id);
+        if (legalEntity == null)
+        {
+            return [];
+        }
+        return legalEntity.Phones;
+
+    }
+
+    public async Task<Phone?> GetPhoneById(long id, long phoneId)
     {
         var legalEntity = await GetById(id);
         if (legalEntity == null)
         {
             return null;
+        }   
+        var phone = legalEntity.GetPhoneById(phoneId);
+        if (phone == null)
+        {
+            return null;
+        }
+        return phone;
+    }
+
+    public async Task<bool> RemovePhone(long id, long phoneId)
+    {
+        var legalEntity = await GetById(id);
+        if (legalEntity == null)
+        {
+            return false;
         }
         legalEntity.RemovePhone(phoneId);
-        return await _repository.Save(legalEntity);
+        await _repository.Save(legalEntity);
+        return true;
     }
 
     public async Task<LegalEntity?> UpdatePhone(long id, long phoneId, UpdatePhoneDTO dto)
@@ -112,50 +139,172 @@ public class LegalEntityService : ILegalEntityService
         {
             phone.Number = dto.Number;
         }
+
+        legalEntity.UpdatedAt = DateTime.UtcNow;
+
         return await _repository.Save(legalEntity);
     }
 
-    public async Task<LegalEntity?> AddEmail(long id, Email email)
+    public async Task<LegalEntity?> AddEmail(long id, CreateEmailDTO dto)
     {
         var legalEntity = await GetById(id);
         if (legalEntity == null)
         {
             return null;
         }
+        var email = new Email {
+            EmailAddress = dto.EmailAddress,
+            Client = legalEntity
+        };
+
         legalEntity.AddEmail(email);
         return await _repository.Save(legalEntity);
     }
 
-    public async Task<LegalEntity?> RemoveEmail(long id, long emailId)
+    public async Task<List<Email>> GetAllEmails(long id)
+    {
+        var legalEntity = await GetById(id);
+        if (legalEntity == null)
+        {
+            return [];
+        }
+        return legalEntity.Emails;
+    }
+
+    public async Task<Email?> GetEmailById(long id, long emailId)
+    {
+        var legalEntity = await GetById(id);
+        if (legalEntity == null)
+        {
+            return null;
+        }   
+        var email = legalEntity.GetEmailById(emailId);
+        if (email == null)
+        {
+            return null;
+        }
+        return email;
+    }
+
+    public async Task<bool> RemoveEmail(long id, long emailId)
+    {
+        var legalEntity = await GetById(id);
+        if (legalEntity == null)
+        {
+            return false;
+        }
+        legalEntity.RemoveEmail(emailId);
+        await _repository.Save(legalEntity);
+        return true;
+    }
+
+    public async Task<LegalEntity?> UpdateEmail(long id, long emailId, UpdateEmailDTO dto)
     {
         var legalEntity = await GetById(id);
         if (legalEntity == null)
         {
             return null;
         }
-        legalEntity.RemoveEmail(emailId);
+        var email = legalEntity.GetEmailById(emailId);
+        if (email == null)
+        {
+            return null;
+        }
+        if (!string.IsNullOrWhiteSpace(dto.EmailAddress))
+        {
+            email.EmailAddress = dto.EmailAddress;
+        }
+
+        legalEntity.UpdatedAt = DateTime.UtcNow;
+
         return await _repository.Save(legalEntity);
     }
 
-    public async Task<LegalEntity?> AddAddress(long id, Address address)
+    public async Task<LegalEntity?> AddAddress(long id, CreateAddressDTO dto)
     {
         var legalEntity = await GetById(id);
         if (legalEntity == null)
         {
             return null;
         }
+        var address = new Address {
+            Street = dto.Street,
+            Number = dto.Number,
+            City = dto.City,
+            FederativeUnit = dto.FederativeUnit,
+            Client = legalEntity
+        };
+
         legalEntity.AddAddress(address);
         return await _repository.Save(legalEntity);
     }
 
-    public async Task<LegalEntity?> RemoveAddress(long id, long addressId)
+    public async Task<List<Address>> GetAllAddresses(long id)
+    {
+        var legalEntity = await GetById(id);
+        if (legalEntity == null)
+        {
+            return [];
+        }
+        return legalEntity.Addresses;
+    }
+
+    public async Task<Address?> GetAddressById(long id, long addressId)
+    {
+        var legalEntity = await GetById(id);
+        if (legalEntity == null)
+        {
+            return null;
+        }   
+        var address = legalEntity.GetAddressById(addressId);
+        if (address == null)
+        {
+            return null;
+        }
+        return address;
+    }
+
+    public async Task<bool> RemoveAddress(long id, long addressId)
+    {
+        var legalEntity = await GetById(id);
+        if (legalEntity == null)
+        {
+            return false;
+        }
+        legalEntity.RemoveAddress(addressId);
+        await _repository.Save(legalEntity);
+        return true;
+    }
+
+    public async Task<LegalEntity?> UpdateAddress(long id, long addressId, UpdateAddressDTO dto)
     {
         var legalEntity = await GetById(id);
         if (legalEntity == null)
         {
             return null;
         }
-        legalEntity.RemoveAddress(addressId);
+        var address = legalEntity.GetAddressById(addressId);
+        if (address == null)
+        {
+            return null;
+        }
+        if (!string.IsNullOrWhiteSpace(dto.Street))
+        {
+            address.Street = dto.Street;
+        } if (!string.IsNullOrWhiteSpace(dto.Number))
+        {
+            address.Number = dto.Number;
+        } if (!string.IsNullOrWhiteSpace(dto.City))
+        {
+            address.City = dto.City;
+        } if (!string.IsNullOrWhiteSpace(dto.FederativeUnit))
+        {
+            address.FederativeUnit = dto.FederativeUnit;
+        }
+
+        legalEntity.UpdatedAt = DateTime.UtcNow;
+
         return await _repository.Save(legalEntity);
     }
+
 }

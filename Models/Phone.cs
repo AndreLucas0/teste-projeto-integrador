@@ -8,6 +8,6 @@ public class Phone
     public required string Number { get; set; }
     public long ClientId { get; set; }
     [JsonIgnore]
-    public Client Client { get; set; }
+    public Client? Client { get; set; }
 
 }

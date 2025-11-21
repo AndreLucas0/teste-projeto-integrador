@@ -9,4 +9,5 @@ public interface INaturalPersonRepository
     Task<NaturalPerson> Create(NaturalPerson naturalPerson);
     Task<NaturalPerson> Update(NaturalPerson naturalPerson);
     Task<bool> Delete(long id);
+    Task<NaturalPerson> Save(NaturalPerson naturalPerson);
 }

@@ -1,3 +1,5 @@
+using System.Text.Json.Serialization;
+
 namespace api.Models;
 
 public class Address
@@ -8,5 +10,6 @@ public class Address
     public required string City { get; set; }
     public required string FederativeUnit { get; set; }
     public long ClientId { get; set; }
-    public required Client Client { get; set; }
+    [JsonIgnore]
+    public Client? Client { get; set; }
 }

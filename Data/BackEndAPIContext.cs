@@ -22,6 +22,11 @@ namespace api.Data
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
+            modelBuilder.Entity<Client>().ToTable("Client");
+            modelBuilder.Entity<LegalEntity>().ToTable("LegalEntity");
+            modelBuilder.Entity<NaturalPerson>().ToTable("NaturalPerson");
+
+
             modelBuilder.Entity<Client>()
                 .HasMany(c => c.Phones)
                 .WithOne(p => p.Client)
